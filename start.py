@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime
 from time import sleep
 from pysine import sine
@@ -13,7 +14,7 @@ data = []
 detected = False
 
 
-def player(m):
+def player(mixer, repeat=2):
     """Plays sounds with different frequencies and volume levels"""
     global signal
     global detected
@@ -22,17 +23,17 @@ def player(m):
     frequencies = [125, 250, 500, 1000, 2000, 4000, 8000]
 
     # shuffle frequencies
-    frequencies = np.repeat(frequencies, 2)
+    frequencies = np.repeat(frequencies, repeat)
     np.random.shuffle(frequencies)
 
-    m.setvolume(0)
+    mixer.setvolume(0)
     sleep(0.1)
     for freq in frequencies:
         detected = False
         for vol in volumes:
             print(freq, vol)
             for n in range(3):
-                m.setvolume(vol)
+                mixer.setvolume(vol)
                 sleep(0.1)
                 signal = [freq, vol, datetime.now()]
                 sine(frequency=freq, duration=0.5)
@@ -58,17 +59,17 @@ def listener():
             detected = True
 
 
-def greeing(m, opening=True):
+def greeing(mixer, opening=True):
     """Plays simple greeting to check sound"""
     frequencies = [261, 329, 391]
     durations = [0.2, 0.2, 0.5]
-    m.setvolume(30)
+    mixer.setvolume(30)
     sleep(0.1)
     if opening:
         _ = [sine(frequency=f, duration=d) for f, d in zip(frequencies, durations)]
     else:
         _ = [sine(frequency=f, duration=d) for f, d in zip(frequencies[::-1], durations)]
-    m.setvolume(0)
+    mixer.setvolume(0)
     sleep(0.1)
 
 
@@ -78,7 +79,6 @@ def analyse_results(data):
     # load data to DataFrame
     df = pd.DataFrame(data, columns=['frequency', 'volume', 'played', 'heard'])
     df['reaction_time'] = (df['heard'] - df['played']).dt.microseconds // 1000
-    df.to_csv(f'./results_before_{now:%Y%m%d%H%M%S}.csv', index=None)
 
     # average multiple results
     df = df.groupby(['frequency']).mean().reset_index()
@@ -89,7 +89,7 @@ def analyse_results(data):
     # visualize results
     fig, ax = plt.subplots(1)
     ax.plot(df['frequency'].astype(str), df['volume'], marker='x')
-    ax.set(title=f"Hearing capacity", ylim=[0, 100], xlabel='Hz', ylabel='volume')
+    ax.set(title=f"Hearing capacity", ylim=[0, 50], xlabel='Hz', ylabel='volume')
     ax.grid()
     plt.gca().invert_yaxis()
     plt.savefig(f'./results_{now:%Y%m%d%H%M%S}_capacity.png')
@@ -109,6 +109,9 @@ def analyse_results(data):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--repeat', help='Number of times each frequency is repeated', required=False, default=2)
+    args = parser.parse_args()
 
     f = Figlet(font='slant')
     print(f.renderText('HEARING TEST'))
@@ -122,7 +125,7 @@ if __name__ == '__main__':
 
     m = alsaaudio.Mixer()
     # play greeting
-    greeing(m, opening=True)
+    greeing(mixer=m, opening=True)
 
     print('Test will start in 5 seconds...')
     sleep(5)
@@ -130,10 +133,10 @@ if __name__ == '__main__':
     p2 = threading.Thread(target=listener, daemon=True)
     p2.start()
     # start player
-    player(m)
+    player(mixer=m, repeat=args.repeat)
 
     # play greeting
-    greeing(m, opening=False)
+    greeing(mixer=m, opening=False)
 
     analyse_results(data)
     print('Test is finished. Please check visualizations.')
