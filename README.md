@@ -43,8 +43,8 @@ Script will store the data in CSV file and will automatically generate report ab
 
 <table>
 <tr>
-<td><img src="./sample_output/results_capacity_bad.png"/></td>
-<td><img src="./sample_output/results_reaction_bad.png"/></td>
+<td><img src="./sample_output/capacity_bad.png"/></td>
+<td><img src="./sample_output/reaction_bad.png"/></td>
 </tr>
 </table>
 
