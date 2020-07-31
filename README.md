@@ -34,8 +34,8 @@ Script will store the data in CSV file and will automatically generate report ab
 
 <table>
 <tr>
-<td>![](sample_output/results_capacity_good.png)</td>
-<td>![](sample_output/results_reaction_good.png)</td>
+<td><img src="./sample_output/results_capacity_good.png"/></td>
+<td><img src="./sample_output/results_reaction_good.png"/></td>
 </tr>
 </table>
 
@@ -43,8 +43,8 @@ Script will store the data in CSV file and will automatically generate report ab
 
 <table>
 <tr>
-<td>![](sample_output/results_capacity_bad.png)</td>
-<td>![](sample_output/results_reaction_bad.png)</td>
+<td><img src="./sample_output/results_capacity_bad.png"/></td>
+<td><img src="./sample_output/results_reaction_bad.png"/></td>
 </tr>
 </table>
 
